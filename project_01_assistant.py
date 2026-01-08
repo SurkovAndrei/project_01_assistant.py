@@ -177,9 +177,9 @@ def main() -> None:
         handle_todo(todo)
     elif choice == "5":
         print(f"Пока, {name}! Увидимся 🙂")
-    break
     elif choice == "6":
         handle_ai_question()
+        break
     else:
         print("Не понял выбор. Введи 1, 2, 3, 4, 5 или 6.")
 
