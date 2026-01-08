@@ -101,3 +101,98 @@ def handle_ai_question() -> None:
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "Ты дружелюбный и краткий помощник. Отвечай по-русски."},
+            {"role": "user", "content": question},
+        ],
+    )
+
+    answer = response.choices[0].message.content
+    print("\nОтвет ИИ:\n")
+    print(answer)
+
+
+def handle_todo(todo: list[str]) -> None:
+    while True:
+        print("\nTo-Do меню:")
+        print("1 — Показать список")
+        print("2 — Добавить задачу")
+        print("3 — Удалить задачу по номеру")
+        print("4 — Назад")
+
+        choice = ask_text("Выбери номер: ")
+
+        if choice == "1":
+            if not todo:
+                print("Список дел пуст.")
+            else:
+                print("Твои задачи:")
+                for i, item in enumerate(todo, start=1):
+                    print(f"{i}. {item}")
+
+        elif choice == "2":
+            task = ask_text("Введи задачу: ")
+            if task:
+                todo.append(task)
+                save_todo(todo)
+                print("Добавлено.")
+            else:
+                print("Пустую задачу не добавляем 🙂")
+
+        elif choice == "3":
+            if not todo:
+                print("Список пуст — нечего удалять.")
+                continue
+            index = ask_int("Номер задачи для удаления: ", min_value=1, max_value=len(todo))
+            removed = todo.pop(index - 1)
+            save_todo(todo)
+            print(f"Удалено: {removed}")
+
+        elif choice == "4":
+            break
+
+        else:
+            print("Не понял выбор. Введи 1, 2, 3 или 4.")
+
+
+def main() -> None:
+    print("Привет! Я твой персональный помощник 🙂")
+
+    name = ask_text("Как тебя зовут? ", default="друг")
+    print(f"Приятно познакомиться, {name}!")
+
+    age = ask_int("Сколько тебе лет? ", min_value=0, max_value=120)
+    if age < 18:
+        print("Ты ещё несовершеннолетний.")
+    else:
+        print("Ты уже взрослый человек.")
+
+    todo: list[str] = load_todo()
+
+    while True:
+        show_menu()
+        choice = ask_text("Выбери номер: ")
+
+        if choice == "1":
+            handle_mood()
+
+        elif choice == "2":
+            handle_advice()
+
+        elif choice == "3":
+            handle_sum()
+
+        elif choice == "4":
+            handle_todo(todo)
+
+        elif choice == "5":
+            print(f"Пока, {name}! Увидимся 🙂")
+            break
+
+        elif choice == "6":
+            handle_ai_question()
+
+        else:
+            print("Не понял выбор. Введи 1, 2, 3, 4, 5 или 6.")
+
+
+if __name__ == "__main__":
+    main()
