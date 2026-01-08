@@ -4,8 +4,7 @@
 import json
 from pathlib import Path
 
-TODO_FILE = Path("todo.json")
-
+TODO_FILE = Path(__file__).with_name("todo.json")
 
 def load_todo() -> list[str]:
     if not TODO_FILE.exists():
