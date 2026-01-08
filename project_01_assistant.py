@@ -1,8 +1,16 @@
 # project_01_assistant.py
 # Project 01: Personal Console Assistant (v2.0)
 
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
 import json
 from pathlib import Path
+
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 
 TODO_FILE = Path(__file__).with_name("todo.json")
 
@@ -57,12 +65,36 @@ def show_menu() -> None:
     print("3 — Мини-калькулятор (сложение)")
     print("4 — Список дел (To-Do)")
     print("5 — Выйти")
+    print("6 — Спросить ИИ")
 
 
 def handle_mood() -> None:
     mood = ask_int("Какое у тебя настроение (1-10)? ", min_value=1, max_value=10)
     print(f"Понял тебя. Настроение: {mood}/10. Спасибо, что поделился!")
 
+def handle_ai_question() -> None:
+    question = ask_text("Спроси у ИИ: ")
+    if not question:
+        print("Вопрос пустой.")
+        return
+
+    if not os.getenv("OPENAI_API_KEY"):
+        print("Ключ OPENAI_API_KEY не найден. Проверь файл .env.")
+        return
+
+    print("Думаю... 🤖")
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "Ты дружелюбный и краткий помощник. Отвечай по-русски."},
+            {"role": "user", "content": question}
+        ]
+    )
+
+    answer = response.choices[0].message.content
+    print("\nОтвет ИИ:\n")
+    print(answer)
 
 def handle_advice() -> None:
     print("Мой совет: учись регулярно по 20–30 минут в день — это сильнее, чем редкие марафоны 🙂")
@@ -134,21 +166,22 @@ def main() -> None:
     while True:
         show_menu()
         choice = ask_text("Выбери номер: ")
-
-        if choice == "1":
-            handle_mood()
-        elif choice == "2":
-            handle_advice()
-        elif choice == "3":
-            handle_sum()
-        elif choice == "4":
-            handle_todo(todo)
-        elif choice == "5":
-            print(f"Пока, {name}! Увидимся 🙂")
-            break
-        else:
-            print("Не понял выбор. Введи 1, 2, 3, 4 или 5.")
-
+        
+    if choice == "1":
+        handle_mood()
+    elif choice == "2":
+        handle_advice()
+    elif choice == "3":
+        handle_sum()
+    elif choice == "4":
+        handle_todo(todo)
+    elif choice == "5":
+        print(f"Пока, {name}! Увидимся 🙂")
+    break
+    elif choice == "6":
+        handle_ai_question()
+    else:
+        print("Не понял выбор. Введи 1, 2, 3, 4, 5 или 6.")
 
 if __name__ == "__main__":
     main()
