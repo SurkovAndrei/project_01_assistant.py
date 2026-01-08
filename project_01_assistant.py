@@ -1,6 +1,31 @@
 # project_01_assistant.py
 # Project 01: Personal Console Assistant (v2.0)
 
+import json
+from pathlib import Path
+
+TODO_FILE = Path("todo.json")
+
+
+def load_todo() -> list[str]:
+    if not TODO_FILE.exists():
+        return []
+    try:
+        data = json.loads(TODO_FILE.read_text(encoding="utf-8"))
+        if isinstance(data, list) and all(isinstance(x, str) for x in data):
+            return data
+    except Exception:
+        pass
+    return []
+
+
+def save_todo(todo: list[str]) -> None:
+    TODO_FILE.write_text(
+        json.dumps(todo, ensure_ascii=False, indent=2),
+        encoding="utf-8"
+    )
+
+
 def ask_text(prompt: str, default: str | None = None) -> str:
     text = input(prompt).strip()
     if text == "" and default is not None:
@@ -72,6 +97,7 @@ def handle_todo(todo: list[str]) -> None:
             task = ask_text("Введи задачу: ")
             if task:
                 todo.append(task)
+                save_todo(todo)
                 print("Добавлено.")
             else:
                 print("Пустую задачу не добавляем 🙂")
@@ -82,6 +108,7 @@ def handle_todo(todo: list[str]) -> None:
                 continue
             index = ask_int("Номер задачи для удаления: ", min_value=1, max_value=len(todo))
             removed = todo.pop(index - 1)
+            save_todo(todo)
             print(f"Удалено: {removed}")
 
         elif choice == "4":
@@ -103,7 +130,7 @@ def main() -> None:
     else:
         print("Ты уже взрослый человек.")
 
-    todo: list[str] = []
+    todo: list[str] = load_todo()
 
     while True:
         show_menu()
