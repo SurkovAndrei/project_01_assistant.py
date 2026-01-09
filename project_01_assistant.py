@@ -92,22 +92,27 @@ def handle_ai_question() -> None:
         return
 
     if not os.getenv("OPENAI_API_KEY"):
-        print("Ключ OPENAI_API_KEY не найден. Проверь файл .env (он должен быть рядом со скриптом).")
+        print("Ключ OPENAI_API_KEY не найден. Проверь файл .env.")
         return
 
-    print("Думаю... 🤖")
+    print("\nДумаю... 🤖\n")
 
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "Ты дружелюбный и краткий помощник. Отвечай по-русски."},
-            {"role": "user", "content": question},
-        ],
+            {"role": "user", "content": question}
+        ]
     )
 
     answer = response.choices[0].message.content
-    print("\nОтвет ИИ:\n")
+
+    print("\n" + "=" * 60)
+    print("ОТВЕТ ИИ:\n")
     print(answer)
+    print("=" * 60)
+
+    input("\nНажми Enter, чтобы вернуться в меню...")
 
 
 def handle_todo(todo: list[str]) -> None:
